@@ -4,6 +4,12 @@
  */
 package TASK_05;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author sn96g
@@ -79,9 +85,19 @@ public class StudentManagement extends javax.swing.JFrame {
 
         btn_add.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btn_add.setText("ADD");
+        btn_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addActionPerformed(evt);
+            }
+        });
 
         btn_update.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btn_update.setText("Update");
+        btn_update.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_updateActionPerformed(evt);
+            }
+        });
 
         btn_del.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btn_del.setText("Delete");
@@ -216,7 +232,33 @@ public class StudentManagement extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_delActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_delActionPerformed
-        // TODO add your handling code here:
+        // Delete button Action
+
+        String rNum = tf_rollNum.getText();
+
+        if (rNum.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please enter the roll number of the student you want to delete.");
+        } else {
+            try {
+                String query = "DELETE FROM student WHERE index_num=?";
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                preparedStatement.setString(1, rNum);
+                int rowsDeleted = preparedStatement.executeUpdate();
+
+                if (rowsDeleted > 0) {
+                    JOptionPane.showMessageDialog(null, "Student deleted successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No student found with the provided roll number.");
+                }
+
+                // Close resources
+                preparedStatement.close();
+                conn.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
     }//GEN-LAST:event_btn_delActionPerformed
 
     private void btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_resetActionPerformed
@@ -226,8 +268,79 @@ public class StudentManagement extends javax.swing.JFrame {
         tf_cont.setText(null);
         tf_grade.setText(null);
         tf_rollNum.setText(null);
-        
+
     }//GEN-LAST:event_btn_resetActionPerformed
+
+    private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
+        // TODO add your handling code here:
+        String name = tf_name.getText();
+        String rNum = tf_rollNum.getText();
+        String grade = tf_grade.getText();
+        String address = tf_address.getText();
+        String cont = tf_cont.getText();
+
+        if (name.isEmpty() || rNum.isEmpty() || grade.isEmpty() || address.isEmpty() || cont.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please enter the details correctly.");
+        } else {
+            try {
+                String query = "INSERT INTO student (s_name, index_num, grade, address, contact) VALUES (?, ?, ?, ?, ?)";
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/students", "root", "");
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                preparedStatement.setString(1, name);
+                preparedStatement.setString(2, rNum);
+                preparedStatement.setString(3, grade);
+                preparedStatement.setString(4, address);
+                preparedStatement.setString(5, cont);
+                preparedStatement.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Student added successfully.");
+
+                // Close resources
+                preparedStatement.close();
+                conn.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+
+
+    }//GEN-LAST:event_btn_addActionPerformed
+
+    private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
+        // Update data into the DB
+        String name = tf_name.getText();
+        String rNum = tf_rollNum.getText();
+        String grade = tf_grade.getText();
+        String address = tf_address.getText();
+        String cont = tf_cont.getText();
+
+        if (name.isEmpty() || rNum.isEmpty() || grade.isEmpty() || address.isEmpty() || cont.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please enter the details correctly.");
+        } else {
+            try {
+                String query = "UPDATE student SET s_name=?, grade=?, address=?, contact=? WHERE index_num=?";
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                preparedStatement.setString(1, name);
+                preparedStatement.setString(2, grade);
+                preparedStatement.setString(3, address);
+                preparedStatement.setString(4, cont);
+                preparedStatement.setString(5, rNum);
+                int rowsUpdated = preparedStatement.executeUpdate();
+
+                if (rowsUpdated > 0) {
+                    JOptionPane.showMessageDialog(null, "Student updated successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No student found with the provided roll number.");
+                }
+
+                // Close resources
+                preparedStatement.close();
+                conn.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btn_updateActionPerformed
 
     /**
      * @param args the command line arguments
